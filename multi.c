@@ -21,6 +21,7 @@
 #define TRUE   1
 #define FALSE  0
 #define MAX_BUF 10240
+#define IL_KART 30
 
 /* network functions */
 #include <sys/types.h>
@@ -33,8 +34,48 @@
 #include <sys/sendfile.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+// include'y do losowania i generowania tablicy
+#include <time.h>
+
 
 /* metoda z cwiczen od Gogolewskiego */
+
+int tablica[IL_KART];
+
+void wypelnijTablice(){
+    int i;
+    for (i = 0; i < (IL_KART / 2); i++){
+        tablica[i] = i+1;
+        printf("tablica[%d]: %d\n", i, tablica[i]);
+    }
+    for (i = (IL_KART / 2); i < IL_KART; i++){
+        tablica[i] = i-14;
+        printf("tablica[%d]: %d\n", i, tablica[i]);
+    }
+}
+
+void permutujTablice(){
+
+   // for i from n − 1 downto 1 do
+     //  j ← random integer with 0 ≤ j ≤ i
+       //exchange a[j] and a[i]
+
+    int i, j;
+    int temp;
+    srand(time(0));
+    j = rand() % IL_KART;
+    for (i = IL_KART-1; i>0; i--){
+        j = rand() % i;
+        temp = tablica[j];
+        tablica[j] = tablica[i];
+        tablica[i] = temp;
+    }
+    printf("\nTablica po permutancji\n");
+    for (i = 0; i < IL_KART; i++){
+        printf("tablica[%d]: %d\n", i, tablica[i]);
+    }
+}
+
 void ObsluzPolaczenie(int gn)
 {
     char sciezka[512];
@@ -145,6 +186,9 @@ int main()
 
   char *message="Data-relay v0.1 (C)1996 Simon Amor <simon@foobar.co.uk>\n\r";
 
+  wypelnijTablice();
+  permutujTablice();
+
 /* initialise all client_socket[] to 0 so not checked */
   for (loop=0; loop < max_clients; loop++) {
     client_socket[loop] = 0;
@@ -250,60 +294,13 @@ int main()
           buffer[valread] = '\0';
 
 
-          // dodane do obslugi plikow
-            // ale jednak i tak coś nie dziala
-            // wiec do zakomentowania
-          /*strcpy(filename, buffer);
-          printf("\nFilename to: %s\n", filename);
-          filename[valread] = '\0';
-          if (filename[strlen(filename)-1] == '\n')
-            filename[strlen(filename)-1] = '\0';
-          if (filename[strlen(filename)-1] == '\r')
-            filename[strlen(filename)-1] = '\0';
 
-            /* open the file to be sent */
-
-            /*fd = open(filename, O_RDONLY);
-            if (fd == -1) {
-              fprintf(stderr, "unable to open '%s': %s\n", filename, strerror(errno));
-              exit(1);
-            }
-
-            /* get the size of the file to be sent */
-           // fstat(fd, &stat_buf);
-
-
-
-
-
-
-
-          // to bylo dodane do osblugi plikow
             printf("\nWchodze do loop2");
           for (loop2=0; loop2<max_clients; loop2++) {
 /* note, flags for send() are normally 0, see man page for details */
             printf("Tera idzie po loop2\n");
-          //  send(client_socket[loop2], buffer, strlen(buffer), 0);   ----- chwilowo usuniete do testow z plikami
-          /**********************************************/
-          /* wrzucone zamiast senda by wyslac plik      */
+            send(client_socket[loop2], buffer, strlen(buffer), 0);
 
-          /* copy file using sendfile
-            offset = 0;
-            rc = sendfile (client_socket[loop2], fd, (off_t*) &offset, stat_buf.st_size);
-            if (rc == -1) {
-              fprintf(stderr, "error from sendfile: %s\n", strerror(errno));
-              exit(1);
-            }
-            if (rc != stat_buf.st_size) {
-              fprintf(stderr, "incomplete transfer from sendfile: %d of %d bytes\n",
-                      rc,
-                      (int)stat_buf.st_size);
-              exit(1);
-            }
-
-
-
-          /*********************************************/
 
 
 
