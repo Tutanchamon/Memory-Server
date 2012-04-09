@@ -49,7 +49,7 @@ void ObsluzPolaczenie(int gn)
         printf("Potomny: blad przy odczycie sciezki\n");
         return;
     }*/
-    strcpy(sciezka, "a.gif");
+    strcpy(sciezka, "a.jpg");
 
     printf("Potomny: klient chce plik %s\n", sciezka);
 
@@ -66,14 +66,23 @@ void ObsluzPolaczenie(int gn)
     }
 
     printf("Potomny: dlugosc pliku: %d\n", fileinfo.st_size);
+    int rozmiar = fileinfo.st_size;
 
     dl_pliku = htonl((long) fileinfo.st_size);
-
-   /* if (send(gn, &dl_pliku, sizeof(long), 0) != sizeof(long))
+    printf("Rozmiar longa to: %ld\n", sizeof(long));
+    printf("Dlugosc pliku w formacie network: %ld\n", dl_pliku);
+    printf("Zmienna rozmiar: %d\n", rozmiar);
+    char rozmiarpliku[8];
+//    itoa(rozmiar, rozmiarpliku, 10); // 10 - decimal;
+    sprintf(rozmiarpliku, "%d", rozmiar);
+    printf("Tresc zmiennej rozmiarpliku: %s\n", rozmiarpliku);
+   // if (send(gn, &dl_pliku, sizeof(long), 0) != sizeof(long))  -- bylo oryginalnie
+    if (send(gn, &rozmiarpliku, sizeof(rozmiarpliku), 0) != sizeof(rozmiarpliku))
+   // if (send(gn, &rozmiar, sizeof(int), 0) != sizeof(int))
     {
         printf("Potomny: blad przy wysylaniu wielkosci pliku\n");
         return;
-    }*/
+    }
 
     dl_pliku = fileinfo.st_size;
     wyslano_razem = 0;
