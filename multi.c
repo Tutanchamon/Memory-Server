@@ -1,25 +1,25 @@
 /******************************************
- * Filename : multi.c
- * Purpose  : handles data from up to three sockets and relays to others
- *            could easily be expanded
- * Author   : Simon Amor (simon@foobar.co.uk)
- *
- * Warning  : This code is not fully functional - it's also not my usual
- *            coding style. Converting this to a set of functions is left
- *            as an exercise to the reader ;-)
- ***/
+* Filename : multi.c
+* Purpose : handles data from up to three sockets and relays to others
+* could easily be expanded
+* Author : Simon Amor (simon@foobar.co.uk)
+*
+* Warning : This code is not fully functional - it's also not my usual
+* coding style. Converting this to a set of functions is left
+* as an exercise to the reader ;-)
+***/
 
 /*
- * WARNING: THIS CODE IS ONLY PARTIALLY FUNCTIONAL
- */
+* WARNING: THIS CODE IS ONLY PARTIALLY FUNCTIONAL
+*/
 
 #include <stdio.h>
 /* for EXIT_FAILURE and EXIT_SUCCESS */
 #include <string.h>
 #include <stdlib.h>
 
-#define TRUE   1
-#define FALSE  0
+#define TRUE 1
+#define FALSE 0
 #define MAX_BUF 10240
 #define IL_KART 30
 
@@ -57,7 +57,7 @@ void wypelnijTablice(){
 void permutujTablice(){
 
    // for i from n − 1 downto 1 do
-     //  j ← random integer with 0 ≤ j ≤ i
+     // j ← random integer with 0 ≤ j ≤ i
        //exchange a[j] and a[i]
 
     int i, j;
@@ -85,11 +85,11 @@ void ObsluzPolaczenie(int gn)
     unsigned char bufor[1024];
 
    /* memset(sciezka, 0, 512);
-    if (recv(gn, sciezka, 512, 0) <= 0)
-    {
-        printf("Potomny: blad przy odczycie sciezki\n");
-        return;
-    }*/
+if (recv(gn, sciezka, 512, 0) <= 0)
+{
+printf("Potomny: blad przy odczycie sciezki\n");
+return;
+}*/
     strcpy(sciezka, "a.jpg");
 
     printf("Potomny: klient chce plik %s\n", sciezka);
@@ -109,15 +109,17 @@ void ObsluzPolaczenie(int gn)
     printf("Potomny: dlugosc pliku: %d\n", fileinfo.st_size);
     int rozmiar = fileinfo.st_size;
 
+
     dl_pliku = htonl((long) fileinfo.st_size);
     printf("Rozmiar longa to: %ld\n", sizeof(long));
     printf("Dlugosc pliku w formacie network: %ld\n", dl_pliku);
     printf("Zmienna rozmiar: %d\n", rozmiar);
     char rozmiarpliku[8];
-//    itoa(rozmiar, rozmiarpliku, 10); // 10 - decimal;
+    memset(rozmiarpliku, 0, strlen(rozmiarpliku));  // dodane zeby sprawdzic, czy permutancja psuje
+// itoa(rozmiar, rozmiarpliku, 10); // 10 - decimal;
     sprintf(rozmiarpliku, "%d", rozmiar);
     printf("Tresc zmiennej rozmiarpliku: %s\n", rozmiarpliku);
-   // if (send(gn, &dl_pliku, sizeof(long), 0) != sizeof(long))  -- bylo oryginalnie
+   // if (send(gn, &dl_pliku, sizeof(long), 0) != sizeof(long)) -- bylo oryginalnie
     if (send(gn, &rozmiarpliku, sizeof(rozmiarpliku), 0) != sizeof(rozmiarpliku))
    // if (send(gn, &rozmiar, sizeof(int), 0) != sizeof(int))
     {
@@ -156,6 +158,9 @@ void ObsluzPolaczenie(int gn)
 
 int main()
 {
+    wypelnijTablice();
+    permutujTablice();
+
   int opt=TRUE;
   int master_socket;
   struct sockaddr_in address;
@@ -167,27 +172,26 @@ int main()
   int max_clients=3;
 
   int activity, loop, loop2, valread;
-  char buffer[10240];    /* data buffer of 1K */
+  char buffer[10240]; /* data buffer of 1K */
 
   char filename[10240];
-    struct stat stat_buf;      /* argument to fstat */
+    struct stat stat_buf; /* argument to fstat */
     int rc;
     int offset = 0;
     int i;
 
     // te z polibudy
     int fd;
-	int count_r, count_w;
-	char* bufptr;
-	char buf[MAX_BUF];
+int count_r, count_w;
+char* bufptr;
+char buf[MAX_BUF];
 
 
   fd_set readfds;
 
   char *message="Data-relay v0.1 (C)1996 Simon Amor <simon@foobar.co.uk>\n\r";
 
-  wypelnijTablice();
-  permutujTablice();
+
 
 /* initialise all client_socket[] to 0 so not checked */
   for (loop=0; loop < max_clients; loop++) {
@@ -230,10 +234,10 @@ int main()
   while (1==1) {
     FD_ZERO(&readfds);
 /* reason we say max_clients+3 is stdin,stdout,stderr take up the first
- * couple of descriptors and we might as well allow a couple of extra.
- * If your program opens files at all you will want to allow enough extra.
- * Another option is to specify the maximum your operating system allows.
- */
+* couple of descriptors and we might as well allow a couple of extra.
+* If your program opens files at all you will want to allow enough extra.
+* Another option is to specify the maximum your operating system allows.
+*/
 
 /* setup which sockets to listen on */
     FD_SET(master_socket, &readfds);
@@ -262,15 +266,16 @@ int main()
       printf("New socket is fd %d\n",new_socket);
 
 /* transmit message to new connection */
-/*      if (send(new_socket, message, strlen(message), 0) != strlen(message)) {
+/* if (send(new_socket, message, strlen(message), 0) != strlen(message)) {
 /* if send failed to send all the message, display error and exit */
-     /*   perror("send");
-      }*/
+     /* perror("send");
+}*/
      // else printf("\nWiadomosc wyslana");
 
      // puts("Welcome message sent successfully");
 
 /* add new socket to list of sockets */
+
         ObsluzPolaczenie(new_socket);
       for (loop=0; loop<max_clients; loop++) {
         if (client_socket[loop] == 0) {
@@ -315,18 +320,18 @@ int main()
 
         }
 /*
- * use read() to read from the socket into a buffer using something
- * similar to the following:
- *
- * If the read didn't cause an error then send buffer to all
- * client sockets in the array - use for loop and send() just
- * as if you were sending it to one connection
- *
- * important point to note is that if the connection is char-by-char
- * the person will not be able to send a complete string and you will
- * need to use buffers for each connection, checking for overflows and
- * new line characters (\n or \r)
- */
+* use read() to read from the socket into a buffer using something
+* similar to the following:
+*
+* If the read didn't cause an error then send buffer to all
+* client sockets in the array - use for loop and send() just
+* as if you were sending it to one connection
+*
+* important point to note is that if the connection is char-by-char
+* the person will not be able to send a complete string and you will
+* need to use buffers for each connection, checking for overflows and
+* new line characters (\n or \r)
+*/
       }
     }
   }
@@ -334,4 +339,3 @@ int main()
 /* normally you should close the sockets here before program exits */
 /* however, in this example the while() loop prevents getting here */
 }
-
