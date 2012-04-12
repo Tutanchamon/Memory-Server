@@ -98,6 +98,10 @@ void przeslijTablice(int gn){
     }
 }
 
+void funkcjaTestowa(char* test){
+    printf("%s", test);
+}
+
 void ObsluzPolaczenie(int gn)
 {
     char sciezka[512];
@@ -183,6 +187,7 @@ return;
 
 int main()
 {
+    funkcjaTestowa("knut malpi z Krzysialkiem kampi\n");
     wypelnijTablice();
     permutujTablice();
 
