@@ -76,6 +76,28 @@ void permutujTablice(){
     }
 }
 
+void przeslijTablice(int gn){
+
+    int i;
+
+    for (i=0; i<IL_KART; i++){
+        int nr = tablica[i];
+        printf("\nint nr = %d", nr);
+        char numerkarty[2];
+        memset(numerkarty, 0, strlen(numerkarty));
+        sprintf(numerkarty, "%d", nr);
+        printf("\nchar numerkarty = %s", numerkarty);
+
+        if (send(gn, &numerkarty, sizeof(numerkarty), 0) != sizeof(numerkarty))
+
+    {
+        printf("\nBlad przy wysylaniu numeru karty");
+        return;
+    }
+
+    }
+}
+
 void ObsluzPolaczenie(int gn)
 {
     char sciezka[512];
@@ -116,7 +138,7 @@ return;
     printf("Zmienna rozmiar: %d\n", rozmiar);
     char rozmiarpliku[8];
     memset(rozmiarpliku, 0, strlen(rozmiarpliku));  // dodane zeby sprawdzic, czy permutancja psuje
-// itoa(rozmiar, rozmiarpliku, 10); // 10 - decimal;
+
     sprintf(rozmiarpliku, "%d", rozmiar);
     printf("Tresc zmiennej rozmiarpliku: %s\n", rozmiarpliku);
    // if (send(gn, &dl_pliku, sizeof(long), 0) != sizeof(long)) -- bylo oryginalnie
@@ -146,8 +168,11 @@ return;
         printf("Potomny: wyslano %d bajtow\n", wyslano_razem);
     }
 
-    if (wyslano_razem == dl_pliku)
+    if (wyslano_razem == dl_pliku) {
         printf("Potomny: plik wyslany poprawnie\n");
+            memset(bufor, 0, sizeof(bufor));
+            bufor[0] = '\0';
+    }
     else
         printf("Potomny: blad przy wysylaniu pliku\n");
     fclose(plik);
@@ -276,7 +301,9 @@ char buf[MAX_BUF];
 
 /* add new socket to list of sockets */
 
+
         ObsluzPolaczenie(new_socket);
+        przeslijTablice(new_socket); // dodano
       for (loop=0; loop<max_clients; loop++) {
         if (client_socket[loop] == 0) {
           client_socket[loop] = new_socket;
