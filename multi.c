@@ -76,6 +76,27 @@ void permutujTablice(){
     }
 }
 
+/* Presylanie numeru gracza */
+void przeslijNumerGracza(int gn, int numer){
+
+    printf("\nNumer gracza to: %d\nWysylanie numeru gracza", numer);
+    char playernumber[2];
+    memset(playernumber, 0 , strlen(playernumber));
+    sprintf(playernumber,"%d", numer);
+    printf("\nchar playernumber = %d", playernumber);
+
+    if (send(gn, &playernumber, sizeof(playernumber), 0) != sizeof(playernumber)){
+            printf("\nBlad przy wysylaniu numeru gracza");
+            return;
+    }
+
+    else {
+        printf("\nNumer gracza wyslany poprawnie");
+    }
+}
+/*****************************************/
+
+/* Przesylanie ulozenia kart */
 void przeslijTablice(int gn){
 
     int i;
@@ -97,12 +118,9 @@ void przeslijTablice(int gn){
 
     }
 }
+/********************************************/
 
-void funkcjaTestowa(char* test){
-    printf("%s", test);
-}
-
-
+/* Przesylanie pojedynczego pliku */
 void ObsluzPolaczenie(int gn, char* sciezka)
 {
     //char sciezka[512];
@@ -187,6 +205,7 @@ return;
 }
 /*********************************/
 
+/* Przesylanie obrazkow kart */
 void odbierzPliki(int gn){
     char nazwa[100];
     int i;
@@ -212,10 +231,11 @@ void odbierzPliki(int gn){
         printf("\nNie ma juz wiecej do pobrania");
 }
 
+/****************************************************/
+
 
 int main()
 {
-    funkcjaTestowa("knut malpi z Krzysialkiem kampi\n");
     wypelnijTablice();
     permutujTablice();
 
@@ -342,6 +362,7 @@ char buf[MAX_BUF];
         if (client_socket[loop] == 0) {
           client_socket[loop] = new_socket;
           printf("Adding to list of sockets as %d\n", loop);
+          przeslijNumerGracza(new_socket, loop);
           loop = max_clients;
         }
       }
