@@ -102,9 +102,12 @@ void funkcjaTestowa(char* test){
     printf("%s", test);
 }
 
-void ObsluzPolaczenie(int gn)
+
+void ObsluzPolaczenie(int gn, char* sciezka)
 {
-    char sciezka[512];
+    //char sciezka[512];
+    char sciezka2[512];
+
     long dl_pliku, wyslano, wyslano_razem, przeczytano;
     struct stat fileinfo;
     FILE* plik;
@@ -116,23 +119,23 @@ if (recv(gn, sciezka, 512, 0) <= 0)
 printf("Potomny: blad przy odczycie sciezki\n");
 return;
 }*/
-    strcpy(sciezka, "a.jpg");
+    //strcpy(sciezka, "0.jpg");
 
-    printf("Potomny: klient chce plik %s\n", sciezka);
+    printf("\nKlient chce plik %s\n", sciezka);
 
     if (stat(sciezka, &fileinfo) < 0)
     {
-        printf("Potomny: nie moge pobrac informacji o pliku\n");
+        printf("\nNie moge pobrac informacji o pliku\n");
         return;
     }
 
     if (fileinfo.st_size == 0)
     {
-        printf("Potomny: rozmiar pliku 0\n");
+        printf("\nRozmiar pliku 0\n");
         return;
     }
 
-    printf("Potomny: dlugosc pliku: %d\n", fileinfo.st_size);
+    printf("\nDlugosc pliku: %d\n", fileinfo.st_size);
     int rozmiar = fileinfo.st_size;
 
 
@@ -183,6 +186,31 @@ return;
     return;
 }
 /*********************************/
+
+void odbierzPliki(int gn){
+    char nazwa[100];
+    int i;
+    char  en[8];
+    int pob;
+    strcpy(en, "ENOUGH");
+
+    //while (strcmp(nazwa, "ENOUGH") != 0){
+        for (i=0; i < 16; i++){
+        memset(nazwa, 0, strlen(nazwa));
+        if ((pob = recv(gn, nazwa, 100, 0)) <= 0){
+            printf("\nNie podano nazwy pliku");
+            return;
+        }
+        else {
+            printf("\npob wynosi %d", pob);
+            printf("Nazwa pliku do pobrania to: %s", nazwa);
+            nazwa[pob-1] = '\0';
+            ObsluzPolaczenie(gn, nazwa);
+        }
+        }
+
+        printf("\nNie ma juz wiecej do pobrania");
+}
 
 
 int main()
@@ -307,7 +335,8 @@ char buf[MAX_BUF];
 /* add new socket to list of sockets */
 
 
-        ObsluzPolaczenie(new_socket);
+        //ObsluzPolaczenie(new_socket);
+        odbierzPliki(new_socket);
         przeslijTablice(new_socket); // dodano
       for (loop=0; loop<max_clients; loop++) {
         if (client_socket[loop] == 0) {
